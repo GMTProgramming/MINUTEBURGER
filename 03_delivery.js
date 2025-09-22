@@ -1,118 +1,64 @@
-html, body {
-  height: 100%;
-  margin: 0;
-  padding: 0;
-  background-color: #FFF4E8;
-  font-family: Arial, sans-serif;
-}
+document.addEventListener("DOMContentLoaded", () => {
+  const slidesContainer = document.querySelector(".slides");
+  const slides = document.querySelectorAll(".slide");
+  const prevBtn = document.querySelector(".prev");
+  const nextBtn = document.querySelector(".next");
+  const dots = document.querySelectorAll(".dot");
 
-/* Fixed Header */
-.header {
-  width: 100%;
-  height: 75px;
-  background-color: rgb(252,225,34);
-  position: fixed;
-  top: 0;
-  left: 0;
-  z-index: 10;
-}
-.header2 {
-  width: 100%;
-  height: 25px;
-  background-color: rgb(252,134,0);
-  position: fixed;
-  top: 65px;
-  left: 0;
-  z-index: 10;
-}
-.MB img{
-  width: 65px;
-  height: 65px;
-  position: fixed;
-  top: 0px;
-  left: 10px;
-  right: 0px;
-  z-index: 10;
-}
-.logo{
-  font-family: Fredoka One;
-}
-/* Carousel container */
-.carousel {
-  position: relative;
-  margin-top: 150px;
-  width: 700px;
-  height: 350px;
-  margin-left: auto;
-  margin-right: auto;
-  overflow: hidden;
-  border-radius: 40px;
-  box-shadow: 0 5px 15px rgba(0,0,0,0.3);
-}
+  let index = 0;
+  let timer;
+  const AUTO_MS = 4000; // 4 seconds auto-slide
 
-/* Slides wrapper */
-.slides {
-  display: flex;
-  height: 100%;
-  transition: transform 0.6s ease;
-}
+  function showSlide(n) {
+    if (n >= slides.length) index = 0;
+    else if (n < 0) index = slides.length - 1;
+    else index = n;
 
-/* Each slide takes full carousel size */
-.slide {
-  flex: 0 0 100%;   /* one slide = full width */
-  height: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
+    slidesContainer.style.transform = `translateX(${-index * 100}%)`;
 
-.slide img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  border-radius: 40px;
-}
+    dots.forEach((dot, i) => {
+      dot.classList.toggle("active", i === index);
+    });
+  }
 
-/* Arrows */
-.prev,
-.next {
-  cursor: pointer;
-  position: absolute;
-  top: 50%;
-  transform: translateY(-50%);
-  padding: 16px;
-  color: white;
-  font-weight: bold;
-  font-size: 30px;
-  background: rgba(0,0,0,0.4);
-  border: none;
-  border-radius: 50%;
-  user-select: none;
-  transition: background 0.3s;
-  z-index: 5;
-}
-.prev { left: 20px; }
-.next { right: 20px; }
-.prev:hover,
-.next:hover { background: rgba(0,0,0,0.8); }
+  function nextSlide() {
+    showSlide(index + 1);
+  }
 
-/* Dots */
-.dots {
-  text-align: center;
-  position: absolute;
-  bottom: 15px;
-  width: 100%;
-}
-.dot {
-  cursor: pointer;
-  height: 12px;
-  width: 12px;
-  margin: 0 5px;
-  background-color: #bbb;
-  border-radius: 50%;
-  display: inline-block;
-  transition: background 0.3s;
-}
-.dot.active,
-.dot:hover { background-color: #717171; }
+  function prevSlide() {
+    showSlide(index - 1);
+  }
 
+  function startAuto() {
+    timer = setInterval(nextSlide, AUTO_MS);
+  }
+
+  function stopAuto() {
+    clearInterval(timer);
+  }
+
+  // Buttons
+  nextBtn.addEventListener("click", () => {
+    nextSlide();
+    stopAuto();
+    startAuto();
+  });
+  prevBtn.addEventListener("click", () => {
+    prevSlide();
+    stopAuto();
+    startAuto();
+  });
+
+  // Dots
+  dots.forEach((dot, i) => {
+    dot.addEventListener("click", () => {
+      showSlide(i);
+      stopAuto();
+      startAuto();
+    });
+  });
+
+  // Init
+  showSlide(0);
+  startAuto();
+});
